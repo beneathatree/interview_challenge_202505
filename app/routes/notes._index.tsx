@@ -76,7 +76,7 @@ export async function action({ request }: ActionFunctionArgs) {
 }
 
 export default function NotesIndexPage() {
-  const { notes } = useLoaderData<typeof loader>();
+  const { formattedNotes } = useLoaderData<typeof loader>();
   const [isOpen, setIsOpen] = useState(false);
   const navigation = useNavigation();
   const isLoading = navigation.state === "loading";
@@ -138,7 +138,7 @@ export default function NotesIndexPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              {isLoading ? <NotesGridSkeleton /> : <NotesGrid notes={notes} />}
+              {isLoading ? <NotesGridSkeleton /> : <NotesGrid notes={formattedNotes} />}
             </CardContent>
           </Card>
         </div>
