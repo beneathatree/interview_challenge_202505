@@ -1,4 +1,5 @@
-import { json, type ActionFunctionArgs } from "@remix-run/node";
+import { type ActionFunctionArgs } from "@remix-run/node";
+import { data as json } from "@remix-run/node";
 import { useActionData, useNavigation } from "@remix-run/react";
 import { LoginForm } from "~/components/auth/login-form";
 import { authenticateUser } from "~/services/auth.server";
@@ -38,7 +39,7 @@ export async function action({ request }: ActionFunctionArgs) {
     }
 
     // Create session
-    return createUserSession(user.id, redirectTo);
+    return createUserSession(user.id.toString(), redirectTo);
   } catch (error) {
     console.error("Login error:", error);
     return json(

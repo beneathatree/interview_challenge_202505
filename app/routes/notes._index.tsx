@@ -1,8 +1,8 @@
 import {
-  json,
   type LoaderFunctionArgs,
   type ActionFunctionArgs,
 } from "@remix-run/node";
+import { data as json } from "@remix-run/node";
 import { useLoaderData, useNavigation } from "@remix-run/react";
 import { Button } from "~/components/ui/button";
 import { NotesGrid } from "~/components/notes/notes-grid";
@@ -30,7 +30,11 @@ import { NotesGridSkeleton } from "~/components/notes/note-skeleton";
 export async function loader({ request }: LoaderFunctionArgs) {
   const userId = await requireUserId(request);
   const { notes } = await getNotesByUserId(userId);
-  return json({ notes });
+  const formattedNotes = notes.map((note) => ({
+    ...note,
+    createdAt : note.createdAt.toISOString()
+  }))
+  return ({ formattedNotes });
 }
 
 export async function action({ request }: ActionFunctionArgs) {

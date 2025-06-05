@@ -1,0 +1,1 @@
+import{j as e}from"./jsx-runtime-DlxonYWr.js";const n=()=>[{title:"New Remix App"},{name:"description",content:"Welcome to Remix!"}];function o(){return e.jsx("div",{children:"Hello World"})}export{o as default,n as meta};
