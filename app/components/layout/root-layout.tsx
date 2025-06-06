@@ -23,7 +23,7 @@ export function RootLayout({ children, isAuthenticated }: RootLayoutProps) {
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="border-b">
+      <header className="border-b w-full fixed bg-gray-200">
         <div className="container flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link
             to="/"
@@ -57,8 +57,8 @@ export function RootLayout({ children, isAuthenticated }: RootLayoutProps) {
         <div className="container py-8">{children}</div>
       </main>
 
-      <footer className="border-t py-6">
-        <div className="container flex items-center justify-between">
+      <footer className="border-t py-6 px-4">
+        <div className="container flex flex-col md:flex-row space-y-2 items-center justify-between">
           <p className="text-sm text-muted-foreground">
             © {new Date().getFullYear()} Notes App. All rights reserved.
           </p>
