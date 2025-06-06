@@ -1,12 +1,19 @@
-import { type LoaderFunctionArgs } from "@remix-run/node";
+import { redirect, type LoaderFunctionArgs } from "@remix-run/node";
 import { data as json } from "@remix-run/node";
 import { useLoaderData, useNavigation } from "@remix-run/react";
 import { NoteDetail } from "~/components/notes/note-detail";
 import { NoteDetailSkeleton } from "~/components/notes/note-detail-skeleton";
 import { getNoteById } from "~/services/notes.server";
+import { getUserId } from "~/services/session.server";
+import { useRouteError , isRouteErrorResponse } from "@remix-run/react";
 
-export async function loader({ params }: LoaderFunctionArgs) {
+export async function loader({ request , params }: LoaderFunctionArgs) {
   const noteId = parseInt(params.id || "", 10);
+  const userId = await getUserId(request)
+  
+  if(!userId){
+    return redirect("/login")
+  }
 
   if (isNaN(noteId)) {
     throw new Response("Invalid note ID", { status: 400 });
@@ -15,6 +22,10 @@ export async function loader({ params }: LoaderFunctionArgs) {
   let note = await getNoteById(noteId);
   if (!note) {
     throw new Response("Note not found", { status: 404 });
+  }
+
+  if(note.userId != userId){
+    throw new Response("Unauthorized Unauthorized",{status : 403})
   }
 
   const formattedNote = {
@@ -36,3 +47,6 @@ export default function NoteDetailPage() {
     </div>
   );
 }
+
+
+
