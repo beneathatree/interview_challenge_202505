@@ -29,7 +29,7 @@ import { NotesGridSkeleton } from "~/components/notes/note-skeleton";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const userId = await requireUserId(request);
-  const { notes } = await getNotesByUserId(userId);
+  const { notes } = await getNotesByUserId(parseInt(userId));
   const formattedNotes = notes.map((note) => ({
     ...note,
     createdAt : note.createdAt.toISOString()
@@ -63,9 +63,10 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   try {
+    const noteUserId = parseInt(userId);
     const note = await createNote({
       ...result.data,
-      userId,
+      userId : noteUserId,
     });
 
     return json({ success: true, note });
