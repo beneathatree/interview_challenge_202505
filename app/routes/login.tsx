@@ -1,5 +1,4 @@
-import { type ActionFunctionArgs } from "@remix-run/node";
-import { data as json } from "@remix-run/node";
+import { type ActionFunctionArgs, data as json } from "@remix-run/node";
 import { useActionData, useNavigation } from "@remix-run/react";
 import { LoginForm } from "~/components/auth/login-form";
 import { authenticateUser } from "~/services/auth.server";
