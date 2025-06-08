@@ -1,0 +1,1 @@
+ALTER TABLE "notes" ADD COLUMN "has_favourite" boolean DEFAULT false NOT NULL;

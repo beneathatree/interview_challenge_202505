@@ -1,4 +1,5 @@
-import { json, redirect } from "@remix-run/node";
+import { redirect } from "@remix-run/node";
+import { data as json } from "@remix-run/node";
 import { getUserId } from "~/utils/session.server";
 import { getUserById } from "~/services/auth.server";
 

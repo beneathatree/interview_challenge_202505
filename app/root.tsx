@@ -1,4 +1,5 @@
-import { json, type LoaderFunctionArgs } from "@remix-run/node";
+import { type LoaderFunctionArgs } from "@remix-run/node";
+import { data as json } from "@remix-run/node";
 import {
   Links,
   LiveReload,

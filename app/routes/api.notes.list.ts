@@ -1,4 +1,5 @@
-import { json, type LoaderFunctionArgs } from "@remix-run/node";
+import { type LoaderFunctionArgs } from "@remix-run/node";
+import { data as json } from "@remix-run/node";
 import { requireAuthApi } from "~/middleware/auth";
 import { getNotesByUserId } from "~/services/notes.server";
 
