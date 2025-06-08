@@ -8,6 +8,13 @@
       "when": 1747990096598,
       "tag": "0000_heavy_black_cat",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1749354364848,
+      "tag": "0001_futuristic_tusk",
+      "breakpoints": true
     }
   ]
 }

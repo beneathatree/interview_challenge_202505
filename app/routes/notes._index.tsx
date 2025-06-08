@@ -8,7 +8,7 @@ import { Button } from "~/components/ui/button";
 import { NotesGrid } from "~/components/notes/notes-grid";
 import { NoteForm } from "~/components/notes/note-form";
 import { requireUserId } from "~/services/session.server";
-import { createNote, getNotesByUserId } from "~/services/notes.server";
+import { createNote, getNoteById, getNotesByUserId, updateNote } from "~/services/notes.server";
 import { useState } from "react";
 import { PlusIcon } from "@radix-ui/react-icons";
 import { deleteNote } from "~/services/notes.server";
@@ -49,11 +49,16 @@ export async function action({ request }: ActionFunctionArgs) {
   const formData = await request.formData();
   const intent = formData.get("intent");
 
-  // DELETE NOTE LOGIC
+  // DELETE NOTE
   if (intent === "delete") {
     const noteId = Number(formData.get("noteId"));
     if (isNaN(noteId)) {
       return json({ success: false, error: "Invalid note id" }, { status: 400 });
+    }
+
+    const isNoteExist = await getNoteById(noteId);
+    if (!isNoteExist) {
+      return json({ success: false, error: "Note doesn't exist" }, { status: 404 });
     }
 
     const deleted = await deleteNote(noteId, parseInt(userId));
@@ -64,7 +69,33 @@ export async function action({ request }: ActionFunctionArgs) {
     return json({ success: true, message: "Note deleted" });
   }
 
-  // CREATE NOTE LOGIC (default intent)
+  // TOGGLE FAVORITE
+  if (intent === "toggleFavorite") {
+    const noteId = Number(formData.get("noteId"));
+    if (isNaN(noteId)) {
+      return json({ success: false, error: "Invalid note id" }, { status: 400 });
+    }
+
+    const note = await getNoteById(noteId);
+    if (!note) {
+      return json({ success: false, error: "Note doesn't exist" }, { status: 404 });
+    }
+
+    // Flip the has_favourite value
+    const newFavoriteStatus = !note.hasFavourite;
+
+    const updatedNote = await updateNote(noteId, parseInt(userId), {
+      hasFavourite: newFavoriteStatus,
+    });
+
+    if (!updatedNote) {
+      return json({ success: false, error: "Failed to update favorite status" }, { status: 500 });
+    }
+
+    return json({ success: true, note: updatedNote });
+  }
+
+  // CREATE NOTE (default intent)
   const data = {
     title: formData.get("title"),
     description: formData.get("description"),
@@ -95,7 +126,6 @@ export async function action({ request }: ActionFunctionArgs) {
     return json({ error: "Failed to create note" }, { status: 500 });
   }
 }
-
 
 
 
