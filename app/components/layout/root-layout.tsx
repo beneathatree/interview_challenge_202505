@@ -14,16 +14,14 @@ export function RootLayout({ children, isAuthenticated }: RootLayoutProps) {
   if (isAuthPage || !isAuthenticated) {
     return (
       <div className="flex min-h-screen flex-col">
-        <main className="flex flex-1 items-center justify-center">
-          {children}
-        </main>
+        <main className="flex flex-1 items-center justify-center">{children}</main>
       </div>
     );
   }
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="border-b w-full fixed bg-gray-200">
+      <header className="border-b w-full fixed bg-gray-200 h-16 z-50">
         <div className="container flex h-16 items-center justify-between px-4 sm:px-6 lg:px-8">
           <Link
             to="/"
@@ -53,7 +51,8 @@ export function RootLayout({ children, isAuthenticated }: RootLayoutProps) {
         </div>
       </header>
 
-      <main className="flex-1">
+      {/* Push content below fixed header */}
+      <main className="flex-1 pt-16">
         <div className="container py-8">{children}</div>
       </main>
 

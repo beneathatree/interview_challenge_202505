@@ -11,6 +11,7 @@ import { requireUserId } from "~/services/session.server";
 import { createNote, getNotesByUserId } from "~/services/notes.server";
 import { useState } from "react";
 import { PlusIcon } from "@radix-ui/react-icons";
+import { deleteNote } from "~/services/notes.server";
 import {
   Card,
   CardContent,
@@ -37,6 +38,7 @@ export async function loader({ request }: LoaderFunctionArgs) {
   return ({ formattedNotes });
 }
 
+
 export async function action({ request }: ActionFunctionArgs) {
   const userId = await requireUserId(request);
 
@@ -45,6 +47,24 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 
   const formData = await request.formData();
+  const intent = formData.get("intent");
+
+  // DELETE NOTE LOGIC
+  if (intent === "delete") {
+    const noteId = Number(formData.get("noteId"));
+    if (isNaN(noteId)) {
+      return json({ success: false, error: "Invalid note id" }, { status: 400 });
+    }
+
+    const deleted = await deleteNote(noteId, parseInt(userId));
+    if (!deleted) {
+      return json({ success: false, error: "Failed to delete note" }, { status: 500 });
+    }
+
+    return json({ success: true, message: "Note deleted" });
+  }
+
+  // CREATE NOTE LOGIC (default intent)
   const data = {
     title: formData.get("title"),
     description: formData.get("description"),
@@ -66,7 +86,7 @@ export async function action({ request }: ActionFunctionArgs) {
     const noteUserId = parseInt(userId);
     const note = await createNote({
       ...result.data,
-      userId : noteUserId,
+      userId: noteUserId,
     });
 
     return json({ success: true, note });
@@ -76,16 +96,25 @@ export async function action({ request }: ActionFunctionArgs) {
   }
 }
 
+
+
+
+
+
+
 export default function NotesIndexPage() {
   const { formattedNotes } = useLoaderData<typeof loader>();
   const [isOpen, setIsOpen] = useState(false);
   const navigation = useNavigation();
   const isLoading = navigation.state === "loading";
-  // Reset the success handled flag when navigation change
+
   return (
-    <div className="h-full min-h-screen bg-background">
-      <div className="container px-4 py-10 sm:px-6 lg:px-8 lg:py-12">
-        <div className="mx-auto space-y-8">
+    <div className="h-full min-h-screen bg-background pt-16"> {/* pt-16 to offset fixed header height */}
+      <div className="container px-4 py-4 sm:px-6 lg:px-8 lg:py-6 flex flex-col h-[calc(100vh-4rem)]">
+        {/* 4rem = 16 (pt-16) header height */}
+        
+        {/* Fixed top section */}
+        <div className="flex-shrink-0 space-y-4">
           <PageHeader>
             <div className="flex items-center justify-between">
               <div className="space-y-1">
@@ -106,9 +135,7 @@ export default function NotesIndexPage() {
             </div>
           </PageHeader>
 
-          <Separator />
-
-          {isOpen ? (
+          {isOpen && (
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
                 <CardTitle>Create Note</CardTitle>
@@ -122,24 +149,29 @@ export default function NotesIndexPage() {
                 </Button>
               </CardHeader>
               <CardContent>
-                <NoteForm
-                  onSuccess={() => {
-                    setIsOpen(false);
-                  }}
-                />
+                <NoteForm onSuccess={() => {}} />
               </CardContent>
             </Card>
-          ) : null}
+          )}
 
-          <Card>
+          <Separator />
+        </div>
+
+        {/* Scrollable notes list */}
+        <div className="flex-1 overflow-auto">
+          <Card className="h-full flex flex-col">
             <CardHeader>
               <CardTitle>Your Notes</CardTitle>
               <CardDescription>
                 A list of all your notes. Click on a note to view its details.
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              {isLoading ? <NotesGridSkeleton /> : <NotesGrid notes={formattedNotes} />}
+            <CardContent className="flex-1 overflow-auto">
+              {isLoading ? (
+                <NotesGridSkeleton />
+              ) : (
+                <NotesGrid notes={formattedNotes} />
+              )}
             </CardContent>
           </Card>
         </div>
