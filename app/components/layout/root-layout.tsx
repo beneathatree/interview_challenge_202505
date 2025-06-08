@@ -1,6 +1,7 @@
-import { Link, NavLink, useLocation, Form } from "@remix-run/react";
+import { Link, NavLink, useLocation, Form, useSearchParams } from "@remix-run/react";
 import { cn } from "~/lib/utils";
 import { Button } from "~/components/ui/button";
+import { Input } from "~/components/ui/input";
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -11,10 +12,16 @@ export function RootLayout({ children, isAuthenticated }: RootLayoutProps) {
   const location = useLocation();
   const isAuthPage = location.pathname === "/login";
 
+  // 🧠 Get the search param from the URL
+  const [searchParams] = useSearchParams();
+  const searchTerm = searchParams.get("search") || "";
+
   if (isAuthPage || !isAuthenticated) {
     return (
       <div className="flex min-h-screen flex-col">
-        <main className="flex flex-1 items-center justify-center">{children}</main>
+        <main className="flex flex-1 items-center justify-center">
+          {children}
+        </main>
       </div>
     );
   }
@@ -31,6 +38,29 @@ export function RootLayout({ children, isAuthenticated }: RootLayoutProps) {
           </Link>
 
           <nav className="flex items-center gap-6">
+            {/* 🔍 Search bar */}
+            <Form method="get" action="/notes" className="flex gap-2 items-center">
+              <Input
+                type="text"
+                name="search"
+                placeholder="Search notes..."
+                defaultValue={searchTerm}
+                className="w-64"
+              />
+              <Button type="submit">Search</Button>
+              {searchTerm && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => {
+                    window.location.href = "/notes";
+                  }}
+                >
+                  Clear
+                </Button>
+              )}
+            </Form>
+
             <NavLink
               to="/notes"
               className={({ isActive }) =>
@@ -42,6 +72,7 @@ export function RootLayout({ children, isAuthenticated }: RootLayoutProps) {
             >
               Notes
             </NavLink>
+
             <Form action="/logout" method="post">
               <Button variant="ghost" type="submit">
                 Logout

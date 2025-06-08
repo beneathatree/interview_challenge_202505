@@ -30,13 +30,24 @@ import { NotesGridSkeleton } from "~/components/notes/note-skeleton";
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const userId = await requireUserId(request);
+  const url = new URL(request.url);
+  const searchTerm = url.searchParams.get("search")?.toLowerCase() || "";
+
   const { notes } = await getNotesByUserId(parseInt(userId));
-  const formattedNotes = notes.map((note) => ({
-    ...note,
-    createdAt : note.createdAt.toISOString()
-  }))
-  return ({ formattedNotes });
+
+  const formattedNotes = notes
+    .filter((note) =>
+      note.title.toLowerCase().includes(searchTerm) ||
+      note.description?.toLowerCase().includes(searchTerm)
+    )
+    .map((note) => ({
+      ...note,
+      createdAt: note.createdAt.toISOString(),
+    }));
+
+  return { formattedNotes };
 }
+
 
 
 export async function action({ request }: ActionFunctionArgs) {
